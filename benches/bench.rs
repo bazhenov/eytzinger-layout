@@ -1,24 +1,33 @@
-use criterion::{black_box, criterion_group, criterion_main, Criterion};
-use eytzinger_layout::generate_data;
+use criterion::{black_box, criterion_group, criterion_main, Criterion, Throughput};
+use eytzinger_layout::{eytzinger, eytzinger_binary_search, generate_data};
 
 fn criterion_benchmark(c: &mut Criterion) {
-    c.bench_function("binary search (1M/1000)", |b| {
-        let data = generate_data(1_0000_000);
+    let mut g = c.benchmark_group("(1M/1000)");
+    let data = generate_data(1_0000_000);
+    let factor = 1000;
+    let elements = data.len() / factor;
+
+    g.throughput(Throughput::Elements(elements as u64));
+    g.bench_function("std. binary search", |b| {
+        let data = data.clone();
         b.iter(move || {
-            iterate(&data[..], 1_000);
+            for i in 0..elements {
+                let el = &data[i * factor];
+                let _ = black_box(data.binary_search(el));
+            }
         });
     });
-}
 
-/// Iterate each `factor`'th element in a `data` and search it using standart
-/// binary_search algorithm.
-#[inline]
-fn iterate(data: &[u32], factor: usize) {
-    assert!(factor > 0);
-    for i in 0..data.len() / factor {
-        let el = &data[i];
-        let _ = black_box(data.binary_search(el));
-    }
+    g.bench_function("eytzinger binary search", |b| {
+        let eytzinger = eytzinger(&data);
+        let data = &data;
+        b.iter(move || {
+            for i in 0..elements {
+                let el = data[i * factor];
+                let _ = black_box(eytzinger_binary_search(&eytzinger, el));
+            }
+        });
+    });
 }
 
 criterion_group!(benches, criterion_benchmark);
