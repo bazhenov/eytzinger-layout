@@ -1,4 +1,6 @@
-fn eytzinger(input: Vec<u32>) -> Vec<u32> {
+use rand::{thread_rng, RngCore};
+
+pub fn eytzinger(input: Vec<u32>) -> Vec<u32> {
     fn move_element(a: &[u32], b: &mut [u32], mut i: usize, k: usize) -> usize {
         if k <= a.len() {
             i = move_element(a, b, i, 2 * k);
@@ -13,13 +15,26 @@ fn eytzinger(input: Vec<u32>) -> Vec<u32> {
     result
 }
 
+pub fn generate_data(size: usize) -> Vec<u32> {
+    let mut result = Vec::with_capacity(size);
+    let mut rng = thread_rng();
+    let mut s = 0;
+    for _ in 0..result.capacity() {
+        let diff = rng.next_u32() % 15 + 1;
+        s = s + diff;
+        result.push(s);
+    }
+
+    result
+}
+
 #[cfg(test)]
 mod test {
 
     use super::*;
 
     #[test]
-    fn foo() {
+    fn check_eytzinger() {
         let input = vec![0, 1, 2, 3, 4];
         let expected = vec![0, 3, 1, 4, 0, 2];
         let result = eytzinger(input);
