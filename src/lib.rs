@@ -36,7 +36,7 @@ pub fn eytzinger_binary_search(input: &[u32], value: u32) -> Result<usize, ()> {
         if el == value {
             return Ok(idx);
         }
-        idx = if value < el { 2 * idx + 1 } else { 2 * idx + 2 }
+        idx = 2 * idx + 1 + usize::from(value > el);
     }
     Err(())
 }
