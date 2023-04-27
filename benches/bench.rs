@@ -3,7 +3,8 @@ use eytzinger_layout::{eytzinger, eytzinger_binary_search, generate_data};
 
 fn criterion_benchmark(c: &mut Criterion) {
     let mut g = c.benchmark_group("(1M/1000)");
-    let data = generate_data(1_0000_000);
+    let data = generate_data(100_000_000);
+    let eytzinger = eytzinger(&data);
     let factor = 1000;
     let elements = data.len() / factor;
 
@@ -19,8 +20,8 @@ fn criterion_benchmark(c: &mut Criterion) {
     });
 
     g.bench_function("eytzinger binary search", |b| {
-        let eytzinger = eytzinger(&data);
         let data = &data;
+        let eytzinger = &eytzinger;
         b.iter(move || {
             for i in 0..elements {
                 let el = data[i * factor];
