@@ -1,6 +1,6 @@
 use rand::{thread_rng, RngCore};
 use std::collections::HashSet;
-#[cfg(prefetch)]
+#[cfg(feature = "prefetch")]
 use std::{
     arch::x86_64::{_mm_prefetch, _MM_HINT_T0},
     ptr,
@@ -39,7 +39,7 @@ pub fn generate_data(size: usize) -> Vec<u32> {
 pub fn eytzinger_binary_search(input: &[u32], value: u32) -> Result<usize, usize> {
     let mut idx = 1;
     while idx < input.len() {
-        #[cfg(prefetch)]
+        #[cfg(feature = "prefetch")]
         unsafe {
             let prefetch = input.get_unchecked(4 * idx);
             _mm_prefetch::<_MM_HINT_T0>(ptr::addr_of!(prefetch) as *const i8);

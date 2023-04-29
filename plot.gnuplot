@@ -14,4 +14,5 @@ set arrow from 512, graph 0 to 512, graph 1 nohead lc "red" dt 4
 set arrow from 8192, graph 0 to 8192, graph 1 nohead lc "red" dt 4
 
 plot "data.csv" using 1:2 title "std. binary search" with linespoints lc rgbcolor "#ff9900", \
-     "" using 1:3 title "eytzinger layout binary search" with linespoints
+     "" using 1:3 title "eytzinger layout" with linespoints, \
+     "" using 1:4 title "eytzinger layout w. prefetch" with linespoints
