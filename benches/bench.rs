@@ -1,6 +1,6 @@
 use criterion::{criterion_group, criterion_main, BatchSize, Criterion, Throughput};
-use eytzinger_layout::{eytzinger, eytzinger_binary_search, generate_data};
-use rand::{thread_rng, RngCore};
+use eytzinger_layout::{generate_data, Eytzinger};
+use rand::{thread_rng, Rng};
 
 fn criterion_benchmark(c: &mut Criterion) {
     const SIZE: &[usize] = &[
@@ -12,13 +12,13 @@ fn criterion_benchmark(c: &mut Criterion) {
         g.throughput(Throughput::Elements(1));
         for size in SIZE {
             let data = generate_data(size * 1024);
-            let rng = thread_rng();
+            let max = data.last().unwrap();
             let size_kb = data.len() * 4 / 1024;
             g.bench_function(format!("{size_kb}K"), |b| {
                 let data = &data;
-                let mut rng = rng.clone();
+                let mut rng = thread_rng();
                 b.iter_batched(
-                    move || rng.next_u32(),
+                    move || rng.gen_range(0..*max),
                     move |i| data.binary_search(&i),
                     BatchSize::SmallInput,
                 );
@@ -28,17 +28,18 @@ fn criterion_benchmark(c: &mut Criterion) {
 
     {
         let mut g = c.benchmark_group("eytzinger");
+        g.throughput(Throughput::Elements(1));
         for size in SIZE {
             let data = generate_data(size * 1024);
-            let eytzinger = eytzinger(&data);
-            let rng = thread_rng();
+            let eytzinger = Eytzinger::from(&data[..]);
+            let max = data.last().unwrap();
             let size_kb = data.len() * 4 / 1024;
             g.bench_function(format!("{size_kb}K"), |b| {
                 let eytzinger = &eytzinger;
-                let mut rng = rng.clone();
+                let mut rng = thread_rng();
                 b.iter_batched(
-                    move || rng.next_u32(),
-                    move |i| eytzinger_binary_search(eytzinger, i),
+                    move || rng.gen_range(0..*max),
+                    move |i| eytzinger.binary_search(i),
                     BatchSize::SmallInput,
                 );
             });
