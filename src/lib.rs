@@ -36,22 +36,20 @@ pub fn generate_data(size: usize) -> Vec<u32> {
     result
 }
 
-pub fn eytzinger_binary_search(input: &[u32], value: u32) -> Result<usize, usize> {
+pub fn eytzinger_binary_search(input: &[u32], value: u32) -> usize {
     let mut idx = 1;
     while idx < input.len() {
         #[cfg(feature = "prefetch")]
         unsafe {
-            let prefetch = input.get_unchecked(4 * idx);
+            let prefetch = input.get_unchecked(8 * idx);
             _mm_prefetch::<_MM_HINT_T0>(ptr::addr_of!(prefetch) as *const i8);
         }
 
         let el = input[idx];
-        if el == value {
-            return Ok(idx);
-        }
         idx = 2 * idx + usize::from(el < value);
     }
-    Err(0)
+    idx >>= idx.trailing_ones() + 1;
+    idx
 }
 
 #[cfg(test)]
@@ -66,7 +64,7 @@ mod test {
         let result = eytzinger(&input);
         assert_eq!(expected, result);
 
-        assert_eq!(Ok(3), input.binary_search(&3));
+        assert_eq!(1, eytzinger_binary_search(&expected, 3));
     }
 
     #[test]
@@ -75,9 +73,9 @@ mod test {
         let eytz = eytzinger(&input);
 
         for i in input {
-            assert!(eytzinger_binary_search(&eytz, i).is_ok());
+            assert!(eytzinger_binary_search(&eytz, i) > 0);
         }
-        assert!(eytzinger_binary_search(&eytz, 6).is_err())
+        assert!(eytzinger_binary_search(&eytz, 6) == 0)
     }
 
     #[test]
@@ -86,14 +84,15 @@ mod test {
         let eytz = eytzinger(&input);
 
         for i in &input {
-            let idx = eytzinger_binary_search(&eytz, *i).ok();
+            let idx = eytzinger_binary_search(&eytz, *i);
             let expected = eytz
                 .iter()
                 .enumerate()
                 .find(|(_, el)| el == &i)
-                .map(|(idx, _)| idx);
+                .map(|(idx, _)| idx)
+                .unwrap();
             assert_eq!(expected, idx);
         }
-        assert!(eytzinger_binary_search(&eytz, input.last().unwrap() + 1).is_err());
+        assert!(eytzinger_binary_search(&eytz, input.last().unwrap() + 1) == 0);
     }
 }

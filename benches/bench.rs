@@ -4,11 +4,11 @@ use rand::{thread_rng, RngCore};
 
 fn criterion_benchmark(c: &mut Criterion) {
     const SIZE: &[usize] = &[
-        1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384,
+        1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768,
     ];
 
     {
-        let mut g = c.benchmark_group("std. binary search");
+        let mut g = c.benchmark_group("std");
         g.throughput(Throughput::Elements(1));
         for size in SIZE {
             let data = generate_data(size * 1024);
@@ -27,7 +27,7 @@ fn criterion_benchmark(c: &mut Criterion) {
     }
 
     {
-        let mut g = c.benchmark_group("eytzinger binary search");
+        let mut g = c.benchmark_group("eytzinger");
         for size in SIZE {
             let data = generate_data(size * 1024);
             let eytzinger = eytzinger(&data);
