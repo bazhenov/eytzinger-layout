@@ -1,4 +1,4 @@
-use criterion::{criterion_group, criterion_main, BatchSize, Criterion, Throughput};
+use criterion::{criterion_group, criterion_main, BatchSize, Criterion};
 use eytzinger_layout::{generate_data, Eytzinger};
 use rand::{thread_rng, Rng};
 
@@ -9,7 +9,6 @@ fn criterion_benchmark(c: &mut Criterion) {
 
     {
         let mut g = c.benchmark_group("std");
-        g.throughput(Throughput::Elements(1));
         for size in SIZE {
             let data = generate_data(size * 1024);
             let max = data.last().unwrap();
@@ -27,8 +26,26 @@ fn criterion_benchmark(c: &mut Criterion) {
     }
 
     {
+        let mut g = c.benchmark_group("branchless eytzinger");
+        for size in SIZE {
+            let data = generate_data(size * 1024);
+            let eytzinger = Eytzinger::from(&data[..]);
+            let max = data.last().unwrap();
+            let size_kb = data.len() * 4 / 1024;
+            g.bench_function(format!("{size_kb}K"), |b| {
+                let eytzinger = &eytzinger;
+                let mut rng = thread_rng();
+                b.iter_batched(
+                    move || rng.gen_range(0..*max),
+                    move |i| eytzinger.binary_search_branchless(i),
+                    BatchSize::SmallInput,
+                );
+            });
+        }
+    }
+
+    {
         let mut g = c.benchmark_group("eytzinger");
-        g.throughput(Throughput::Elements(1));
         for size in SIZE {
             let data = generate_data(size * 1024);
             let eytzinger = Eytzinger::from(&data[..]);
