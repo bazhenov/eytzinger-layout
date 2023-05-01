@@ -1,3 +1,4 @@
 /target
 *.trace
+*.csv
 /*.svg

@@ -26,7 +26,7 @@ fn criterion_benchmark(c: &mut Criterion) {
     }
 
     {
-        let mut g = c.benchmark_group("branchless eytzinger");
+        let mut g = c.benchmark_group("eytzinger branchless");
         for size in SIZE {
             let data = generate_data(size * 1024);
             let eytzinger = Eytzinger::from(&data[..]);
