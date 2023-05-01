@@ -18,6 +18,5 @@ set label 3 at 8192, graph 0.6 "L3" offset -3,0
 
 plot "std.csv" using 1:2 title "std. binary search" with linespoints lc rgbcolor "#A60400", \
      "eytzinger.csv" using 1:2 title "eytzinger" with linespoints pt 4 lc rgbcolor "#052C6E", \
-     "eytzinger-prefetch.csv" using 1:2 title "eytzinger w. prefetch" with linespoints pt 5 lc rgbcolor "#052C6E", \
      "eytzinger-branchless.csv" using 1:2 title "branchless eytzinger" with linespoints pt 4 lc rgbcolor "#97C300", \
      "eytzinger-branchless-prefetch.csv" using 1:2 title "branchless eytzinger w. prefetch" with linespoints pt 5 lc rgbcolor "#97C300"

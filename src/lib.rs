@@ -29,7 +29,7 @@ impl Eytzinger {
     ///
     /// returns index of an element found or `0` is there is no match
     #[inline]
-    pub fn binary_search_branchless(&self, value: u32) -> usize {
+    pub fn binary_search_branchless(&self, target: u32) -> usize {
         let mut idx = 1;
         while idx < self.0.len() {
             #[cfg(feature = "prefetch")]
@@ -38,16 +38,17 @@ impl Eytzinger {
                 _mm_prefetch::<_MM_HINT_T0>(ptr::addr_of!(prefetch) as *const i8);
             }
             let el = self.0[idx];
-            idx = 2 * idx + usize::from(value > el);
+            idx = 2 * idx + usize::from(el < target);
         }
-        idx >> (idx.trailing_ones() + 1)
+        idx >>= idx.trailing_ones() + 1;
+        usize::from(self.0[idx] == target) * idx
     }
 
     /// Binary search over eytzinger layout array
     ///
     /// returns index of an element found or `0` is there is no match
     #[inline]
-    pub fn binary_search(&self, value: u32) -> usize {
+    pub fn binary_search(&self, target: u32) -> usize {
         let mut idx = 1;
         while idx < self.0.len() {
             #[cfg(feature = "prefetch")]
@@ -56,10 +57,10 @@ impl Eytzinger {
                 _mm_prefetch::<_MM_HINT_T0>(ptr::addr_of!(prefetch) as *const i8);
             }
             let el = self.0[idx];
-            if el == value {
+            if el == target {
                 return idx;
             }
-            idx = 2 * idx + usize::from(value > el);
+            idx = 2 * idx + usize::from(el < target);
         }
         0
     }
@@ -89,12 +90,16 @@ mod test {
 
     #[test]
     fn check_eytzinger_create_simple() {
-        let input = vec![0, 1, 2, 3, 4, 5, 6, 7, 8];
-        let expected = vec![0, 5, 3, 7, 1, 4, 6, 8, 0, 2];
+        let input = vec![1, 2, 3, 4, 5, 6, 7, 8, 10];
+        // let expected = vec![0, 5, 3, 7, 1, 4, 6, 8, 0, 2];
+        let expected = vec![0, 6, 4, 8, 2, 5, 7, 10, 1, 3];
         let result = Eytzinger::from(&input[..]);
         assert_eq!(expected, result.as_slice());
 
-        assert_eq!(2, result.binary_search_branchless(3));
+        assert_eq!(1, result.binary_search_branchless(6));
+        assert_eq!(4, result.binary_search_branchless(2));
+        assert_eq!(0, result.binary_search_branchless(9));
+        assert_eq!(0, result.binary_search_branchless(11));
     }
 
     #[test]
