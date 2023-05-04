@@ -11,5 +11,5 @@ find "$DIR" -type d -depth 1 -print0 |
 while IFS= read -r -d '' EXPERIMENT; do
     DIRNAME="$(basename "$EXPERIMENT")"
     VALUE=$(cat "$EXPERIMENT/new/estimates.json" | jq .slope.point_estimate)
-    echo "${DIRNAME%K},${VALUE}"
+    echo "${DIRNAME},${VALUE}"
 done
