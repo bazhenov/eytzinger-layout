@@ -1,6 +1,6 @@
 # The Eytzinger layout bechmarks
 
-Benchmark code I've written for my article [Fast(er) binary search in Rust](https://www.bazhenov.me/posts/faster-binary-search-in-Rust/).
+Benchmark code I've written for my article [Fast(er) binary search in Rust](https://www.bazhenov.me/posts/faster-binary-search-in-rust/).
 
 ## How to run benchmarks
 
