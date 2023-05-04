@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 
 DIR="$1"
 
@@ -7,7 +7,7 @@ if [ -z "$DIR" ]; then
     exit 1
 fi
 
-find "$DIR" -type d -depth 1 -print0 |
+find "$DIR" -maxdepth 1 -mindepth 1 -type d -print0 |
 while IFS= read -r -d '' EXPERIMENT; do
     DIRNAME="$(basename "$EXPERIMENT")"
     VALUE=$(cat "$EXPERIMENT/new/estimates.json" | jq .slope.point_estimate)
