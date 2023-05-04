@@ -70,13 +70,19 @@ impl Eytzinger {
     }
 }
 
+/// Generates an `Vec<u32>` of a given size with aproximately 0.5 coverage
+///
+/// First element will always be `1` and the last one is `max`. Coverage is the proportion
+/// of elements in the range `1..max` which are present in resulting vector.
+/// The idea behind this algorithm is the following. If you will generate random number between
+/// `1..result.last()` the probability of `result` contains this number is 0.5.
 pub fn generate_data(size: usize) -> Vec<u32> {
     let mut result = Vec::with_capacity(size);
-    let delta = (u32::MAX / size as u32) + 1;
     let mut rng = thread_rng();
-    let mut s = 0;
+    let mut s = 1;
+    result.push(s);
     while result.len() < size {
-        s += rng.gen_range(1..delta);
+        s += 1 + 2 * u32::from(rng.gen::<bool>());
         result.push(s);
     }
 

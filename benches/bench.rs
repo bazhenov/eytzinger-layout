@@ -23,7 +23,7 @@ fn criterion_benchmark(c: &mut Criterion) {
                 let (data, max) = &*data;
                 let mut rng = thread_rng();
                 b.iter_batched(
-                    move || rng.gen_range(0..*max),
+                    move || rng.gen_range(1..*max),
                     move |i| data.binary_search(&i),
                     BatchSize::SmallInput,
                 );
@@ -45,7 +45,7 @@ fn criterion_benchmark(c: &mut Criterion) {
                 let (eytzinger, max) = &*data;
                 let mut rng = thread_rng();
                 b.iter_batched(
-                    move || rng.gen_range(0..*max),
+                    move || rng.gen_range(1..*max),
                     move |i| eytzinger.binary_search_branchless(i),
                     BatchSize::SmallInput,
                 );
@@ -67,7 +67,7 @@ fn criterion_benchmark(c: &mut Criterion) {
                 let (eytzinger, max) = &*data;
                 let mut rng = thread_rng();
                 b.iter_batched(
-                    move || rng.gen_range(0..*max),
+                    move || rng.gen_range(1..*max),
                     move |i| eytzinger.binary_search(i),
                     BatchSize::SmallInput,
                 );
