@@ -34,7 +34,7 @@ impl Eytzinger {
         while idx < self.0.len() {
             #[cfg(feature = "prefetch")]
             unsafe {
-                let prefetch = self.0.get_unchecked(2 * idx);
+                let prefetch = self.0.as_ptr().wrapping_offset(2 * idx as isize);
                 _mm_prefetch::<_MM_HINT_T0>(ptr::addr_of!(prefetch) as *const i8);
             }
             let el = self.0[idx];
@@ -53,7 +53,7 @@ impl Eytzinger {
         while idx < self.0.len() {
             #[cfg(feature = "prefetch")]
             unsafe {
-                let prefetch = self.0.get_unchecked(2 * idx);
+                let prefetch = self.0.as_ptr().wrapping_offset(2 * idx as isize);
                 _mm_prefetch::<_MM_HINT_T0>(ptr::addr_of!(prefetch) as *const i8);
             }
             let el = self.0[idx];
